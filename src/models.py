@@ -10,7 +10,8 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = 'User'
-    user_id = Column(Integer, primary_key=True)
+
+    id = Column(Integer, primary_key=True)
     user_name = Column(String(50), nullable=False)
     firstname = Column(String(50), nullable=False)
     lastname = Column(String(50))
@@ -27,8 +28,9 @@ class User(Base):
 
 class Follower(Base):
     __tablename__ = 'Follower'
-    user_from_id = Column(Integer, ForeignKey(User.user_id))
-    user_to_id = Column(Integer, ForeignKey(User.user_id))
+
+    user_from_id = Column(Integer, ForeignKey(User.id), primary_key=True, nullable=False)
+    user_to_id = Column(Integer, ForeignKey(User.id), primary_key=True, nullable=False)
 
     def to_dict(self):
         return {
@@ -38,8 +40,8 @@ class Follower(Base):
 
 class Post(Base):
     __tablename__ = 'Post'
-    post_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey(User.user_id), nullable=False)
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
 
     def to_dict(self):
         return {
@@ -49,10 +51,11 @@ class Post(Base):
 
 class Media(Base):
     __tablename__ = 'Media'
-    media_id = Column(Integer, primary_key=True)
+
+    id = Column(Integer, primary_key=True)
     type = Column(Enum('photo', 'video', 'reel'), nullable=False)
     URL = Column(String(250), nullable=False)
-    post_id = Column(Integer, ForeignKey(Post.post_id), nullable=False)
+    post_id = Column(Integer, ForeignKey(Post.id), nullable=False)
 
     def to_dict(self):
         return {
@@ -65,16 +68,16 @@ class Media(Base):
 class Comment(Base):
     __tablename__ = 'Comment'
 
-    comment_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     comment_text = Column(String(400), nullable=False)
-    author_id = Column(Integer, ForeignKey(User.user_id), nullable=False)
-    post_id = Column(Integer, ForeignKey(Post.post_id), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    post_id = Column(Integer, ForeignKey(Post.id), nullable=False)
 
     def to_dict(self):
         return {
             "comment_id": self.comment_id,
             "comment_text": self.comment_text,
-            "author_id": self.author_id,
+            "author_id": self.user_id,
             "post_id": self.post_id
         }
 
