@@ -10,7 +10,7 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = 'User'
-    user_id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, primary_key=True)
     user_name = Column(String(50), nullable=False)
     firstname = Column(String(50), nullable=False)
     lastname = Column(String(50))
@@ -38,7 +38,7 @@ class Follower(Base):
 
 class Post(Base):
     __tablename__ = 'Post'
-    post_id = Column(Integer, primary_key=True, nullable=False)
+    post_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.user_id), nullable=False)
 
     def to_dict(self):
@@ -49,7 +49,7 @@ class Post(Base):
 
 class Media(Base):
     __tablename__ = 'Media'
-    media_id = Column(Integer, primary_key=True, nullable=False)
+    media_id = Column(Integer, primary_key=True)
     type = Column(Enum('photo', 'video', 'reel'), nullable=False)
     URL = Column(String(250), nullable=False)
     post_id = Column(Integer, ForeignKey(Post.post_id), nullable=False)
@@ -64,7 +64,8 @@ class Media(Base):
 
 class Comment(Base):
     __tablename__ = 'Comment'
-    comment_id = Column(Integer, primary_key=True, nullable=False)
+
+    comment_id = Column(Integer, primary_key=True)
     comment_text = Column(String(400), nullable=False)
     author_id = Column(Integer, ForeignKey(User.user_id), nullable=False)
     post_id = Column(Integer, ForeignKey(Post.post_id), nullable=False)
