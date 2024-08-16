@@ -1,37 +1,86 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+import enum
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+class User(Base):
+    __tablename__ = 'User'
+    user_id = Column(Integer, primary_key=True, nullable=False)
+    user_name = Column(String(50), nullable=False)
+    firstname = Column(String(50), nullable=False)
+    lastname = Column(String(50))
+    email = Column(String(250), unique=True, nullable=False)
 
     def to_dict(self):
-        return {}
+        return {
+            "user_id": self.user_id,
+            "user_name": self.user_name,
+            "firstname": self.firstname,
+            "lastname": self.lastname,
+            "email": self.email
+        }
 
-## Draw from SQLAlchemy base
+class Follower(Base):
+    __tablename__ = 'Follower'
+    user_from_id = Column(Integer, ForeignKey(User.user_id), primary_key=True)
+    user_to_id = Column(Integer, ForeignKey(User.user_id), primary_key=True)
+
+    def to_dict(self):
+        return {
+            "user_from_id": self.user_from_id,
+            "user_to_id": self.user_to_id
+        }
+
+class Post(Base):
+    __tablename__ = 'Post'
+    post_id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, ForeignKey(User.user_id), nullable=False)
+
+    def to_dict(self):
+        return {
+            "post_id": self.post_id,
+            "user_id": self.user_id
+        }
+
+class Media(Base):
+    __tablename__ = 'Media'
+    media_id = Column(Integer, primary_key=True, nullable=False)
+    type = Column(Enum('photo', 'video', 'reel'), nullable=False)
+    URL = Column(String(250), nullable=False)
+    post_id = Column(Integer, ForeignKey(Post.post_id), nullable=False)
+
+    def to_dict(self):
+        return {
+            "media_id": self.media_id,
+            "type": self.type,
+            "URL": self.URL,
+            "post_id": self.post_id
+        }
+
+class Comment(Base):
+    __tablename__ = 'Comment'
+    comment_id = Column(Integer, primary_key=True, nullable=False)
+    comment_text = Column(String(400), nullable=False)
+    author_id = Column(Integer, ForeignKey(User.user_id), nullable=False)
+    post_id = Column(Integer, ForeignKey(Post.post_id), nullable=False)
+
+    def to_dict(self):
+        return {
+            "comment_id": self.comment_id,
+            "comment_text": self.comment_text,
+            "author_id": self.author_id,
+            "post_id": self.post_id
+        }
+
+# Dibujar el diagrama a partir de la base de datos SQLAlchemy
 try:
     result = render_er(Base, 'diagram.png')
     print("Success! Check the diagram.png file")
 except Exception as e:
-    print("There was a problem genering the diagram")
+    print("There was a problem generating the diagram")
     raise e
