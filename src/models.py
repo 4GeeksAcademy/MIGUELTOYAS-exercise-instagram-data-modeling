@@ -27,8 +27,8 @@ class User(Base):
 
 class Follower(Base):
     __tablename__ = 'Follower'
-    user_from_id = Column(Integer, ForeignKey(User.user_id), primary_key=True)
-    user_to_id = Column(Integer, ForeignKey(User.user_id), primary_key=True)
+    user_from_id = Column(Integer, ForeignKey(User.user_id))
+    user_to_id = Column(Integer, ForeignKey(User.user_id))
 
     def to_dict(self):
         return {
